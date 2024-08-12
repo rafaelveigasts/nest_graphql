@@ -86,6 +86,10 @@ describe('PrismaAuthorsRepository Integrations Test', () => {
       authors.data.forEach(item => {
         expect(item.id).toBeDefined()
       })
+
+      authors.data.reverse().forEach((item, index) => {
+        expect(`${item.email}${index + 1}@a.com`)
+      })
     })
   })
 })
