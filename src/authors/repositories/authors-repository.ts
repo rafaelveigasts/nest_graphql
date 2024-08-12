@@ -9,7 +9,7 @@ export type AuthorSearchInput = {
 }
 
 export type AuthorSearchOutput = {
-  authors: Author[]
+  data: Author[]
   currentPage: number
   perPage: number
   lastPage: number

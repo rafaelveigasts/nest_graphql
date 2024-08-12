@@ -62,7 +62,48 @@ export class PrismaAuthorsRepository implements AuthorsRepository {
 
     return deleted
   }
-  searchAuthors(search: AuthorSearchInput): Promise<AuthorSearchOutput> {
-    throw new Error('Method not implemented.')
+
+  async searchAuthors(search: AuthorSearchInput): Promise<AuthorSearchOutput> {
+    const { filter, page, perPage, sort, sortDir } = search
+
+    const authors = await this.prisma.author.findMany({
+      where: {
+        OR: [{ name: { contains: filter } }, { email: { contains: filter } }],
+      },
+      skip: page > 0 ? (page - 1) * perPage : 1,
+      take: perPage > 0 ? perPage : 1,
+      orderBy: {
+        [sort]: sortDir,
+      },
+    })
+
+    if (!authors) {
+      throw new UserNotFound(`Authors not found`)
+    }
+
+    const count = await this.prisma.author.count({
+      ...(filter && {
+        // o ...filter && é um jeito de dizer que se o filter existir, ele vai fazer o que está dentro do objeto, assim ele só vai fazer a contagem se o filter existir
+        where: {
+          OR: [
+            { name: { contains: filter, mode: 'insensitive' } },
+            { email: { contains: filter, mode: 'insensitive' } },
+          ],
+        },
+      }),
+      orderBy: {
+        [sort]: sortDir,
+      },
+      skip: page > 0 ? (page - 1) * perPage : 1,
+      take: perPage > 0 ? perPage : 1,
+    })
+
+    return {
+      data: authors,
+      currentPage: page,
+      perPage,
+      lastPage: Math.ceil(count / perPage),
+      total: count,
+    }
   }
 }
