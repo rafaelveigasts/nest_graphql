@@ -2,6 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { PrismaAuthorsRepository } from './prisma-authos-repository'
 import { PrismaClient } from '@prisma/client'
 import { execSync } from 'node:child_process'
+import { UserNotFound } from '@/shared/errors/not-found-error'
+import { faker } from '@faker-js/faker'
 
 describe('PrismaAuthorsRepository Integrations Test', () => {
   let module: TestingModule
@@ -22,5 +24,26 @@ describe('PrismaAuthorsRepository Integrations Test', () => {
 
   afterAll(async () => {
     await module.close()
+  })
+
+  test('Should throw an error if author not found', async () => {
+    const id = faker.string.uuid()
+    await expect(repository.getAuthorById(id)).rejects.toThrow(
+      new UserNotFound(`Author with id ${id} not found`),
+    )
+  })
+
+  test('Should find an author', async () => {
+    const user = {
+      name: faker.internet.userName(),
+      email: faker.internet.email(),
+    }
+    const created = await prisma.author.create({
+      data: user,
+    })
+
+    const author = await repository.getAuthorById(created.id)
+
+    expect(author).toEqual(created)
   })
 })
