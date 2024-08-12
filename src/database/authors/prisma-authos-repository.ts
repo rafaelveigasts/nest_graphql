@@ -64,26 +64,24 @@ export class PrismaAuthorsRepository implements AuthorsRepository {
   }
 
   async searchAuthors(search: AuthorSearchInput): Promise<AuthorSearchOutput> {
-    const { filter, page, perPage, sort, sortDir } = search
-
-    const authors = await this.prisma.author.findMany({
-      where: {
-        OR: [{ name: { contains: filter } }, { email: { contains: filter } }],
-      },
-      skip: page > 0 ? (page - 1) * perPage : 1,
-      take: perPage > 0 ? perPage : 1,
-      orderBy: {
-        [sort]: sortDir,
-      },
-    })
-
-    if (!authors) {
-      throw new UserNotFound(`Authors not found`)
-    }
+    const { page = 1, perPage = 15, filter, sort, sortDir } = search
+    const sortable = this.sortableFields?.includes(sort) || false
+    const orderByField = sortable ? sort : 'createdAt'
+    const orderByDir = sortable ? sortDir : 'desc'
 
     const count = await this.prisma.author.count({
       ...(filter && {
-        // o ...filter && é um jeito de dizer que se o filter existir, ele vai fazer o que está dentro do objeto, assim ele só vai fazer a contagem se o filter existir
+        where: {
+          OR: [
+            { name: { contains: filter, mode: 'insensitive' } },
+            { email: { contains: filter, mode: 'insensitive' } },
+          ],
+        },
+      }),
+    })
+
+    const authors = await this.prisma.author.findMany({
+      ...(filter && {
         where: {
           OR: [
             { name: { contains: filter, mode: 'insensitive' } },
@@ -92,10 +90,10 @@ export class PrismaAuthorsRepository implements AuthorsRepository {
         },
       }),
       orderBy: {
-        [sort]: sortDir,
+        [orderByField]: orderByDir,
       },
       skip: page > 0 ? (page - 1) * perPage : 1,
-      take: perPage > 0 ? perPage : 1,
+      take: perPage > 0 ? perPage : 15,
     })
 
     return {
