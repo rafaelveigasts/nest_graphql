@@ -17,6 +17,7 @@ export type AuthorSearchOutput = {
 }
 
 export abstract class AuthorsRepository {
+  sortableFields: string[] = ['name', 'email', 'createdAt']
   abstract getAuthors(): Promise<Author[]>
   abstract getAuthorById(id: number): Promise<Author>
   abstract getAuthorByEmail(email: string): Promise<Author>
