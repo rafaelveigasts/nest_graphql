@@ -4,6 +4,7 @@ import { PrismaClient } from '@prisma/client'
 import { execSync } from 'node:child_process'
 import { UserNotFound } from '@/shared/errors/not-found-error'
 import { faker } from '@faker-js/faker'
+import { createUser } from '@/authors/factories/create-user'
 
 describe('PrismaAuthorsRepository Integrations Test', () => {
   let module: TestingModule
@@ -34,10 +35,8 @@ describe('PrismaAuthorsRepository Integrations Test', () => {
   })
 
   test('Should find an author', async () => {
-    const user = {
-      name: faker.internet.userName(),
-      email: faker.internet.email(),
-    }
+    const user = createUser({})
+
     const created = await prisma.author.create({
       data: user,
     })
