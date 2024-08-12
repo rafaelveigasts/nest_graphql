@@ -4,26 +4,63 @@ import {
   AuthorSearchOutput,
   AuthorsRepository,
 } from '@/authors/repositories/authors-repository'
+import { PrismaService } from '../prisma/prisma.service'
+import { NotFoundError } from 'rxjs'
+import { UserNotFound } from '@/shared/errors/not-found-error'
 
 export class PrismaAuthorsRepository implements AuthorsRepository {
+  constructor(private prisma: PrismaService) {}
+
   sortableFields: string[] = ['name', 'email', 'createdAt']
-  getAuthors(): Promise<Author[]> {
-    throw new Error('Method not implemented.')
+
+  async getAuthors(): Promise<Author[]> {
+    const authors = await this.prisma.author.findMany()
+
+    return authors
   }
-  getAuthorById(id: number): Promise<Author> {
-    throw new Error('Method not implemented.')
+  async getAuthorById(id: string): Promise<Author> {
+    const author = await this.prisma.author.findUnique({
+      where: { id },
+    })
+
+    if (!author) {
+      throw new UserNotFound(`Author with id ${id} not found`)
+    }
+
+    return author
   }
   getAuthorByEmail(email: string): Promise<Author> {
-    throw new Error('Method not implemented.')
+    const author = this.prisma.author.findUnique({
+      where: { email },
+    })
+
+    if (!author) {
+      throw new UserNotFound(`Author with email ${email} not found`)
+    }
+
+    return author
   }
-  createAuthor(author: Author): Promise<Author> {
-    throw new Error('Method not implemented.')
+  async createAuthor(author: Author): Promise<Author> {
+    const _author = await this.prisma.author.create({
+      data: author,
+    })
+
+    return _author
   }
   updateAuthor(author: Author): Promise<Author> {
-    throw new Error('Method not implemented.')
+    const _author = this.prisma.author.update({
+      where: { id: author.id },
+      data: author,
+    })
+
+    return _author
   }
-  deleteAuthor(id: number): Promise<Author> {
-    throw new Error('Method not implemented.')
+  deleteAuthor(id: string): Promise<Author> {
+    const deleted = this.prisma.author.delete({
+      where: { id },
+    })
+
+    return deleted
   }
   searchAuthors(search: AuthorSearchInput): Promise<AuthorSearchOutput> {
     throw new Error('Method not implemented.')
