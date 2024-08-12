@@ -45,4 +45,16 @@ describe('PrismaAuthorsRepository Integrations Test', () => {
 
     expect(author).toEqual(created)
   })
+
+  test('Should create an author', async () => {
+    const user = createUser({})
+
+    const created = await prisma.author.create({
+      data: user,
+    })
+
+    const author = await repository.getAuthorById(created.id)
+
+    expect(author).toHaveProperty('id')
+  })
 })
