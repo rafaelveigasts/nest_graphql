@@ -30,8 +30,8 @@ export class PrismaAuthorsRepository implements AuthorsRepository {
 
     return author
   }
-  getAuthorByEmail(email: string): Promise<Author> {
-    const author = this.prisma.author.findUnique({
+  async getAuthorByEmail(email: string): Promise<Author> {
+    const author = await this.prisma.author.findUnique({
       where: { email },
     })
 

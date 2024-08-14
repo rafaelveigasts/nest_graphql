@@ -93,6 +93,25 @@ describe('PrismaAuthorsRepository Integrations Test', () => {
     expect(result).toMatchObject(author)
   })
 
+  test('Should throw an error when author email not found', async () => {
+    const email = 'teste@teste.com'
+    await expect(repository.getAuthorByEmail(email)).rejects.toThrow(
+      new UserNotFound(`Author with email ${email} not found`),
+    )
+  })
+
+  test('Should find author by email', async () => {
+    const author = await prisma.author.create({
+      data: createUser({
+        email: 'found@found.com',
+      }),
+    })
+
+    const result = await repository.getAuthorByEmail(author.email)
+
+    expect(result).toMatchObject(author)
+  })
+
   test('Should create an author', async () => {
     const user = createUser({})
 
