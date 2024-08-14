@@ -2,23 +2,20 @@ import { Injectable } from '@nestjs/common'
 import { AuthorsRepository } from '../repositories/authors-repository'
 import { BadRequestError } from '@/shared/errors/bad-request-error'
 import { ConflictError } from '@/shared/errors/conflict-error'
+import { AuthorOutput } from '../dto/author-output'
 
-export namespace CreateAuthorUseCase {
+export namespace CreateAuthor {
   type Input = {
     name: string
     email: string
   }
 
-  type Output = {
-    id?: string
-    name: string
-    email: string
-    createdAt?: Date
-  }
+  type Output = AuthorOutput
 
   @Injectable()
-  export class CreateAuthorUseCase {
+  export class UseCase {
     constructor(private authorsRepository: AuthorsRepository) {}
+
     async execute(input: Input): Promise<Output> {
       const { name, email } = input
       if (!name || !email) {

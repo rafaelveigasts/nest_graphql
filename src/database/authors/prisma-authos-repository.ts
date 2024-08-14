@@ -35,10 +35,6 @@ export class PrismaAuthorsRepository implements AuthorsRepository {
       where: { email },
     })
 
-    if (!author) {
-      throw new UserNotFound(`Author with email ${email} not found`)
-    }
-
     return author
   }
   async createAuthor(author: Author): Promise<Author> {
