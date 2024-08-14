@@ -46,6 +46,31 @@ describe('PrismaAuthorsRepository Integrations Test', () => {
     expect(author).toEqual(created)
   })
 
+  test('Should throw an error when updating if author not found', async () => {
+    const data = createUser({})
+    const id = faker.string.uuid()
+    const author = {
+      id,
+      ...data,
+    }
+    await expect(repository.updateAuthor(author)).rejects.toThrow(
+      new UserNotFound(`Author with id ${id} not found`),
+    )
+  })
+
+  test('Should update an author', async () => {
+    const author = await prisma.author.create({
+      data: createUser({}),
+    })
+
+    const result = await repository.updateAuthor({
+      ...author,
+      name: 'Updated',
+    })
+
+    expect(result.name).toBe('Updated')
+  })
+
   test('Should create an author', async () => {
     const user = createUser({})
 

@@ -18,6 +18,7 @@ export class PrismaAuthorsRepository implements AuthorsRepository {
 
     return authors
   }
+
   async getAuthorById(id: string): Promise<Author> {
     const author = await this.prisma.author.findUnique({
       where: { id },
@@ -47,8 +48,9 @@ export class PrismaAuthorsRepository implements AuthorsRepository {
 
     return _author
   }
-  updateAuthor(author: Author): Promise<Author> {
-    const _author = this.prisma.author.update({
+  async updateAuthor(author: Author): Promise<Author> {
+    await this.getAuthorById(author.id)
+    const _author = await this.prisma.author.update({
       where: { id: author.id },
       data: author,
     })
