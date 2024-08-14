@@ -157,6 +157,7 @@ describe('PrismaAuthorsRepository Integrations Test', () => {
         expect(`${item.email}${index + 1}@a.com`)
       })
     })
+
     test('Should only apply pagination and ordering', async () => {
       const createdAt = new Date()
 
@@ -185,6 +186,7 @@ describe('PrismaAuthorsRepository Integrations Test', () => {
       expect(authors.data[0].name).toMatch(data[1].name)
       expect(authors.data[1]).toMatchObject(data[0])
     })
+
     test('Should only apply pagination, filter and ordering', async () => {
       const createdAt = new Date()
 
