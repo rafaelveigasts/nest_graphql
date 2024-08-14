@@ -57,12 +57,14 @@ export class PrismaAuthorsRepository implements AuthorsRepository {
 
     return _author
   }
-  deleteAuthor(id: string): Promise<Author> {
-    const deleted = this.prisma.author.delete({
+
+  async deleteAuthor(id: string): Promise<Author> {
+    const author = await this.getAuthorById(id)
+    this.prisma.author.delete({
       where: { id },
     })
 
-    return deleted
+    return author
   }
 
   async searchAuthors(search: AuthorSearchInput): Promise<AuthorSearchOutput> {
