@@ -91,5 +91,36 @@ describe('PrismaAuthorsRepository Integrations Test', () => {
         expect(`${item.email}${index + 1}@a.com`)
       })
     })
+    test('Should only apply pagination and ordering', async () => {
+      const createdAt = new Date()
+
+      const data = []
+
+      const arrange = 'badec'.split('').forEach((letter, index) => {
+        const timestamp = createdAt.getTime() + index
+        data.push({
+          ...createUser({ name: letter }),
+          email: `author${index}@a.com`,
+          createdAt: new Date(timestamp),
+        })
+      })
+
+      await prisma.author.createMany({
+        data,
+      })
+
+      const authors = await repository.searchAuthors({
+        page: 1,
+        perPage: 2,
+        sort: 'name',
+        sortDir: 'asc',
+      })
+
+      console.log('authors', authors)
+      console.log('arrange', data)
+
+      expect(authors.data[0].name).toMatch(data[1].name)
+      expect(authors.data[1]).toMatchObject(data[0])
+    })
   })
 })
