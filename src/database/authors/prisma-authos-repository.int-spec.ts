@@ -116,11 +116,50 @@ describe('PrismaAuthorsRepository Integrations Test', () => {
         sortDir: 'asc',
       })
 
-      console.log('authors', authors)
-      console.log('arrange', data)
-
       expect(authors.data[0].name).toMatch(data[1].name)
       expect(authors.data[1]).toMatchObject(data[0])
+    })
+    test('Should only apply pagination, filter and ordering', async () => {
+      const createdAt = new Date()
+
+      const data = []
+
+      const arrange = ['test', 'a', 'TEST', 'B', 'Test'].forEach(
+        (element, index) => {
+          const timestamp = createdAt.getTime() + index
+          data.push({
+            ...createUser({ name: element }),
+            email: `author${index}@a.com`,
+            createdAt: new Date(timestamp),
+          })
+        },
+      )
+
+      await prisma.author.createMany({
+        data,
+      })
+
+      const authors = await repository.searchAuthors({
+        page: 1,
+        perPage: 2,
+        sort: 'name',
+        sortDir: 'asc',
+        filter: 'TEST',
+      })
+
+      expect(authors.data[0].name).toMatch(data[0].name)
+      expect(authors.data[1]).toMatchObject(data[4])
+
+      const authors2 = await repository.searchAuthors({
+        page: 2,
+        perPage: 2,
+        sort: 'name',
+        sortDir: 'asc',
+        filter: 'TEST',
+      })
+
+      expect(authors2.data[0]).toMatchObject(data[2])
+      expect(authors2.data.length).toBe(1)
     })
   })
 })
