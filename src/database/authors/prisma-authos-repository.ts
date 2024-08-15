@@ -1,11 +1,11 @@
 import { Author } from '@/authors/graphql/models/author'
 import {
-  AuthorSearchInput,
-  AuthorSearchOutput,
   AuthorsRepository,
+  SearchParams,
+  SearchResult,
 } from '@/authors/repositories/authors-repository'
 import { PrismaService } from '../prisma/prisma.service'
-import { NotFoundError } from 'rxjs'
+
 import { UserNotFound } from '@/shared/errors/not-found-error'
 
 export class PrismaAuthorsRepository implements AuthorsRepository {
@@ -63,8 +63,8 @@ export class PrismaAuthorsRepository implements AuthorsRepository {
     return author
   }
 
-  async searchAuthors(search: AuthorSearchInput): Promise<AuthorSearchOutput> {
-    const { page = 1, perPage = 15, filter, sort, sortDir } = search
+  async searchAuthors(params: SearchParams): Promise<SearchResult> {
+    const { page = 1, perPage = 15, filter, sort, sortDir } = params
     const sortable = this.sortableFields?.includes(sort) || false
     const orderByField = sortable ? sort : 'createdAt'
     const orderByDir = sortable ? sortDir : 'desc'
@@ -97,7 +97,7 @@ export class PrismaAuthorsRepository implements AuthorsRepository {
     })
 
     return {
-      data: authors,
+      items: authors,
       currentPage: page,
       perPage,
       lastPage: Math.ceil(count / perPage),

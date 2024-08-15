@@ -15,13 +15,14 @@ export namespace ListAuthors {
     constructor(private authorsRepository: AuthorsRepository) {}
 
     async execute(input: Input): Promise<Output> {
-      const { data, currentPage, lastPage, perPage, total } =
+      const { items, currentPage, lastPage, perPage, total } =
         await this.authorsRepository.searchAuthors({
-          sort: 'asc',
+          ...input,
+          sortDir: 'asc',
         })
 
       return {
-        data,
+        data: items,
         total,
         currentPage,
         perPage,

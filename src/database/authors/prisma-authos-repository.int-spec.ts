@@ -148,13 +148,13 @@ describe('PrismaAuthorsRepository Integrations Test', () => {
       const authors = await repository.searchAuthors({})
 
       expect(authors.total).toBe(16)
-      expect(authors.data.length).toBe(15)
-      authors.data.forEach(item => {
+      expect(authors.items.length).toBe(15)
+      authors.items.forEach(item => {
         expect(item.id).toBeDefined()
       })
 
-      authors.data.reverse().forEach((item, index) => {
-        expect(`${item.email}${index + 1}@a.com`)
+      authors.items.reverse().forEach((item, index) => {
+        expect(item.email).toEqual(`author${index + 1}@a.com`)
       })
     })
 
@@ -183,8 +183,8 @@ describe('PrismaAuthorsRepository Integrations Test', () => {
         sortDir: 'asc',
       })
 
-      expect(authors.data[0].name).toMatch(data[1].name)
-      expect(authors.data[1]).toMatchObject(data[0])
+      expect(authors.items[0].name).toMatch(data[1].name)
+      expect(authors.items[1]).toMatchObject(data[0])
     })
 
     test('Should only apply pagination, filter and ordering', async () => {
@@ -215,8 +215,8 @@ describe('PrismaAuthorsRepository Integrations Test', () => {
         filter: 'TEST',
       })
 
-      expect(authors.data[0].name).toMatch(data[0].name)
-      expect(authors.data[1]).toMatchObject(data[4])
+      expect(authors.items[0].name).toMatch(data[0].name)
+      expect(authors.items[1]).toMatchObject(data[4])
 
       const authors2 = await repository.searchAuthors({
         page: 2,
@@ -226,8 +226,8 @@ describe('PrismaAuthorsRepository Integrations Test', () => {
         filter: 'TEST',
       })
 
-      expect(authors2.data[0]).toMatchObject(data[2])
-      expect(authors2.data.length).toBe(1)
+      expect(authors2.items[0]).toMatchObject(data[2])
+      expect(authors2.items.length).toBe(1)
     })
   })
 })

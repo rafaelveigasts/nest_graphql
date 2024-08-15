@@ -1,15 +1,14 @@
 import { Author } from '../graphql/models/author'
 
-export type AuthorSearchInput = {
+export type SearchParams = {
   page?: number
   perPage?: number
   filter?: string
   sort?: string
   sortDir?: 'asc' | 'desc'
 }
-
-export type AuthorSearchOutput = {
-  data: Author[]
+export type SearchResult = {
+  items: Author[]
   currentPage: number
   perPage: number
   lastPage: number
@@ -24,5 +23,5 @@ export abstract class AuthorsRepository {
   abstract createAuthor(author: Author): Promise<Author>
   abstract updateAuthor(author: Author): Promise<Author>
   abstract deleteAuthor(id: string): Promise<Author>
-  abstract searchAuthors(search: AuthorSearchInput): Promise<AuthorSearchOutput>
+  abstract searchAuthors(search: SearchParams): Promise<SearchResult>
 }
