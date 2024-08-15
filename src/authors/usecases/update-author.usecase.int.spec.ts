@@ -55,13 +55,16 @@ describe('UpdateAuthorUsecase Integration Tests', () => {
     )
   })
 
-  // test('should return an author', async () => {
-  //   const data = createUser({})
+  test('should be able to update author', async () => {
+    const data = createUser({})
+    const author = await prisma.author.create({ data })
 
-  //   const author = await repository.createAuthor(data)
-
-  //   const result = await usecase.execute({ id: author.id })
-
-  //   expect(result.id).toBe(author.id)
-  // })
+    const result = await usecase.execute({
+      ...author,
+      name: 'Name updated',
+      email: 'a@a.com',
+    })
+    expect(result.name).toEqual('Name updated')
+    expect(result.email).toEqual('a@a.com')
+  })
 })
