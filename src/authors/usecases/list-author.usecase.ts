@@ -18,7 +18,7 @@ export namespace ListAuthors {
       const { items, currentPage, lastPage, perPage, total } =
         await this.authorsRepository.searchAuthors({
           ...input,
-          sortDir: 'asc',
+          sortDir: 'desc',
         })
 
       return {

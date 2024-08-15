@@ -2,6 +2,36 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Author {
+  id: ID!
+  name: String!
+  email: String!
+  createdAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type SearchAuthorsResult {
+  items: [Author!]!
+  currentPage: Int!
+  perPage: Int!
+  total: Int!
+  lastPage: Int!
+}
+
 type Query {
   hello: String!
+  authors(page: Int, perPage: Int, sort: String, sortDir: String, filter: String): SearchAuthorsResult!
+}
+
+type Mutation {
+  createAuthor(data: CreateAuthorInput!): Author!
+}
+
+input CreateAuthorInput {
+  name: String!
+  email: String!
 }
