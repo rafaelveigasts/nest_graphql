@@ -56,7 +56,8 @@ export class PrismaAuthorsRepository implements AuthorsRepository {
 
   async deleteAuthor(id: string): Promise<Author> {
     const author = await this.getAuthorById(id)
-    this.prisma.author.delete({
+
+    await this.prisma.author.delete({
       where: { id },
     })
 
