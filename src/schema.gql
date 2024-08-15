@@ -25,6 +25,7 @@ type SearchAuthorsResult {
 type Query {
   hello: String!
   authors(page: Int, perPage: Int, sort: String, sortDir: String, filter: String): SearchAuthorsResult!
+  getAuthorById(id: String!): Author!
 }
 
 type Mutation {
