@@ -47,16 +47,10 @@ export namespace CreatePost {
         content,
         authorId,
         slug,
+        published: false,
       })
 
-      return {
-        id: post.id,
-        title: post.title,
-        slug: post.slug,
-        content: post.content,
-        published: post.published,
-        authorId: post.authorId,
-      }
+      return post as PostOutput
     }
   }
 }
