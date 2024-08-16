@@ -56,6 +56,26 @@ describe('PrismaPostsRepository Integrations Test', () => {
     expect(foundPost.id).toBe(post.id)
   })
 
+  test('Should find a post by slug', async () => {
+    const postdata = makePost()
+    const authordata = createUser({})
+
+    const author = await prisma.author.create({ data: authordata })
+
+    const post = await prisma.post.create({
+      data: {
+        ...postdata,
+        author: {
+          connect: { ...author },
+        },
+      },
+    })
+
+    const foundPost = await repository.getPostBySlug(post.slug)
+
+    expect(foundPost.slug).toBe(post.slug)
+  })
+
   test('Should create a post', async () => {
     const postdata = makePost()
     const authordata = createUser({})
@@ -68,5 +88,22 @@ describe('PrismaPostsRepository Integrations Test', () => {
     })
 
     expect(result.title).toBe(postdata.title)
+  })
+
+  test('Should update a post', async () => {
+    const postdata = makePost()
+    const authordata = createUser({})
+
+    const author = await prisma.author.create({ data: authordata })
+    const post = await repository.createPost({
+      ...postdata,
+      authorId: author.id,
+    })
+
+    const result = await repository.updatePost(post.id, {
+      title: 'new title',
+    })
+
+    expect(result.title).toBe('new title')
   })
 })
