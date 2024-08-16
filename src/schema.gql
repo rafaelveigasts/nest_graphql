@@ -22,6 +22,16 @@ type SearchAuthorsResult {
   lastPage: Int!
 }
 
+type Post {
+  id: String!
+  title: String!
+  slug: String!
+  content: String!
+  authorId: String!
+  published: Boolean!
+  createdAt: DateTime!
+}
+
 type Query {
   hello: String!
   authors(page: Int, perPage: Int, sort: String, sortDir: String, filter: String): SearchAuthorsResult!
@@ -32,6 +42,7 @@ type Mutation {
   createAuthor(data: CreateAuthorInput!): Author!
   updateAuthor(id: String!, data: UpdateAuthorInput!): Author!
   deleteAuthor(id: String!): Author!
+  createPost(data: CreatePostInput!): Post!
 }
 
 input CreateAuthorInput {
@@ -42,4 +53,10 @@ input CreateAuthorInput {
 input UpdateAuthorInput {
   name: String
   email: String
+}
+
+input CreatePostInput {
+  title: String!
+  content: String!
+  authorId: String!
 }

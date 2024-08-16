@@ -7,10 +7,12 @@ import { PostsRepository } from './repositories/posts-repository'
 import { PrismaAuthorsRepository } from '@/database/authors/prisma-authos-repository'
 import { GetPost } from './usecases/get-post-usecase'
 import { TogglePost } from './usecases/publish-post-usecase'
+import { PostsResolver } from './graphql/resolvers/post.resolver'
 
 @Module({
   imports: [DatabaseModule, PrismaAuthorsRepository, PrismaPostRepository],
   providers: [
+    PostsResolver,
     {
       provide: 'PrismaService',
       useClass: PrismaService,
