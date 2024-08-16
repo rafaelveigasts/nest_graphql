@@ -5,6 +5,7 @@ import { UserNotFound } from '@/shared/errors/not-found-error'
 
 export interface CreatePostInput {
   title: string
+  slug: string
   content: string
   authorId: string
   published?: boolean
@@ -19,8 +20,8 @@ export interface UpdatePostInput {
 export class PrismaPostRepository implements PostsRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async createPost(data: CreatePostInput): Promise<any> {
-    // return this.prismaService.create({ data })
+  async createPost(data: CreatePostInput): Promise<Post> {
+    return this.prismaService.post.create({ data })
   }
   async getPosts(): Promise<Post[]> {
     const posts = await this.prismaService.post.findMany()

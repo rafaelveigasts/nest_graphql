@@ -1,3 +1,7 @@
+import {
+  CreatePostInput,
+  UpdatePostInput,
+} from '@/database/posts/prisma-posts-repository'
 import { Post } from '../graphql/models/post'
 
 export abstract class PostsRepository {

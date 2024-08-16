@@ -55,4 +55,18 @@ describe('PrismaPostsRepository Integrations Test', () => {
 
     expect(foundPost.id).toBe(post.id)
   })
+
+  test('Should create a post', async () => {
+    const postdata = makePost()
+    const authordata = createUser({})
+
+    const author = await prisma.author.create({ data: authordata })
+
+    const result = await repository.createPost({
+      ...postdata,
+      authorId: author.id,
+    })
+
+    expect(result.title).toBe(postdata.title)
+  })
 })
