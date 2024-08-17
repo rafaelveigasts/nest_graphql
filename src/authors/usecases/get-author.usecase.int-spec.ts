@@ -1,22 +1,23 @@
-import { PrismaAuthorsRepository } from '@/database/authors/prisma-authos-repository'
 import { Test, TestingModule } from '@nestjs/testing'
-import { Prisma, PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 import { execSync } from 'node:child_process'
-import { DeleteAuthor } from './delete-author.usecase.'
-import { createUser } from '../factories/create-user'
-import { UserNotFound } from '@/shared/errors/not-found-error'
-describe('DeleteAuthorUsecase Integration Tests', () => {
+import { NotFoundError } from '@/shared/errors/not-found-error'
+import { AuthorsPrismaRepository } from '../repositories/authors-prisma.repository'
+import { GetAuthorUsecase } from './get-author.usecase'
+import { AuthorDataBuilder } from '../helpers/author-data-builder'
+
+describe('GetAuthorUsecase Integration Tests', () => {
   let module: TestingModule
-  let repository: PrismaAuthorsRepository
-  let usecase: DeleteAuthor.UseCase
+  let repository: AuthorsPrismaRepository
+  let usecase: GetAuthorUsecase.Usecase
   const prisma = new PrismaClient()
 
   beforeAll(async () => {
     execSync('npm run prisma:migratetest')
     await prisma.$connect()
     module = await Test.createTestingModule({}).compile()
-    repository = new PrismaAuthorsRepository(prisma as any)
-    usecase = new DeleteAuthor.UseCase(repository)
+    repository = new AuthorsPrismaRepository(prisma as any)
+    usecase = new GetAuthorUsecase.Usecase(repository)
   })
 
   beforeEach(async () => {
@@ -30,17 +31,14 @@ describe('DeleteAuthorUsecase Integration Tests', () => {
   test('should throws an error when the id is not found', async () => {
     await expect(() =>
       usecase.execute({ id: '796c5a25-1d3b-4228-9a75-06f416c6e218' }),
-    ).rejects.toBeInstanceOf(UserNotFound)
+    ).rejects.toBeInstanceOf(NotFoundError)
   })
 
-  test('should delete a author', async () => {
-    const data = createUser({})
+  test('should be able to get author by id', async () => {
+    const data = AuthorDataBuilder({})
     const author = await prisma.author.create({ data })
 
     const result = await usecase.execute({ id: author.id })
     expect(result).toStrictEqual(author)
-
-    const authors = await prisma.author.findMany()
-    expect(authors).toHaveLength(1)
   })
 })

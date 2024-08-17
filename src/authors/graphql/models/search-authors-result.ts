@@ -13,8 +13,8 @@ export class SearchAuthorsResult {
   perPage: number
 
   @Field(() => Int)
-  total: number
+  lastPage: number
 
   @Field(() => Int)
-  lastPage: number
+  total: number
 }

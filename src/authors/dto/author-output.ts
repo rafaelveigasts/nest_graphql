@@ -1,6 +1,6 @@
 export type AuthorOutput = {
-  id?: string
+  id: string
   name: string
   email: string
-  createdAt?: Date
+  createdAt: Date
 }
