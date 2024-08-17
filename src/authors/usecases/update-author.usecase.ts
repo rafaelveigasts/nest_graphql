@@ -1,35 +1,30 @@
-import { Injectable } from '@nestjs/common'
-import { AuthorsRepository } from '../repositories/authors-repository'
+import { BadRequestError } from '@/shared/errors/bad-request-error'
 import { AuthorOutput } from '../dto/author-output'
 import { Author } from '../graphql/models/author'
-import { BadRequestError } from '@/shared/errors/bad-request-error'
+import { AuthorsPrismaRepository } from '../repositories/authors-prisma.repository'
 import { ConflictError } from '@/shared/errors/conflict-error'
 
-export namespace UpdateAuthor {
-  type Input = Partial<Author>
+export namespace UpdateAuthorUsecase {
+  export type Input = Partial<Author>
 
-  type Output = AuthorOutput
+  export type Output = AuthorOutput
 
-  @Injectable()
-  export class UseCase {
-    constructor(private authorsRepository: AuthorsRepository) {}
+  export class Usecase {
+    constructor(private authorsRepository: AuthorsPrismaRepository) {}
 
     async execute(input: Input): Promise<Output> {
       if (!input?.id) {
-        throw new BadRequestError('id is required')
+        throw new BadRequestError('Id not provided')
       }
-
-      const author = await this.authorsRepository.getAuthorById(input.id)
+      const author = await this.authorsRepository.findById(input.id)
 
       if (input.email) {
-        const emailTaken = await this.authorsRepository.getAuthorByEmail(
+        const emailExists = await this.authorsRepository.findByEmail(
           input.email,
         )
-
-        if (emailTaken && author.id !== input.id) {
-          throw new ConflictError('Email already taken')
+        if (emailExists && emailExists.id !== input.id) {
+          throw new ConflictError('Email address used by other author')
         }
-
         author.email = input.email
       }
 
@@ -37,7 +32,7 @@ export namespace UpdateAuthor {
         author.name = input.name
       }
 
-      return await this.authorsRepository.updateAuthor(author)
+      return this.authorsRepository.update(author)
     }
   }
 }

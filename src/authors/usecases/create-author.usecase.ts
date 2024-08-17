@@ -1,38 +1,31 @@
-import { Injectable } from '@nestjs/common'
-import { AuthorsRepository } from '../repositories/authors-repository'
 import { BadRequestError } from '@/shared/errors/bad-request-error'
+import { AuthorsPrismaRepository } from '../repositories/authors-prisma.repository'
 import { ConflictError } from '@/shared/errors/conflict-error'
 import { AuthorOutput } from '../dto/author-output'
 
-export namespace CreateAuthor {
-  type Input = {
+export namespace CreateAuthorUsecase {
+  export type Input = {
     name: string
     email: string
   }
 
-  type Output = AuthorOutput
+  export type Output = AuthorOutput
 
-  @Injectable()
-  export class UseCase {
-    constructor(private authorsRepository: AuthorsRepository) {}
+  export class Usecase {
+    constructor(private authorsRepository: AuthorsPrismaRepository) {}
 
     async execute(input: Input): Promise<Output> {
-      const { name, email } = input
-      if (!name || !email) {
-        throw new BadRequestError('Invalid input')
+      const { email, name } = input
+      if (!email || !name) {
+        throw new BadRequestError('Input data not provided')
       }
 
-      const alreadyExists = await this.authorsRepository.getAuthorByEmail(email)
-
-      if (alreadyExists) {
-        throw new ConflictError('Author already exists')
+      const emailExists = await this.authorsRepository.findByEmail(email)
+      if (emailExists) {
+        throw new ConflictError('Email address used by other author')
       }
 
-      const author = await this.authorsRepository.createAuthor({
-        name,
-        email,
-      })
-
+      const author = await this.authorsRepository.create(input)
       return author
     }
   }

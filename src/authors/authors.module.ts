@@ -1,16 +1,16 @@
 import { Module } from '@nestjs/common'
-import { AuthorsResolver } from './graphql/resolvers/authors/authors.resolver'
+import { AuthorsResolver } from './graphql/resolvers/authors.resolver'
 import { DatabaseModule } from '@/database/database.module'
-import { PrismaAuthorsRepository } from '@/database/authors/prisma-authos-repository'
-import { ListAuthors } from './usecases/list-author.usecase'
 import { PrismaService } from '@/database/prisma/prisma.service'
-import { GetAuthor } from './usecases/get-author.usecase.ts'
-import { UpdateAuthor } from './usecases/update-author.usecase'
-import { DeleteAuthor } from './usecases/delete-author.usecase.'
-import { CreateAuthor } from './usecases/create-author.usecase'
+import { AuthorsPrismaRepository } from './repositories/authors-prisma.repository'
+import { ListAuthorsUsecase } from './usecases/list-authors.usecase'
+import { GetAuthorUsecase } from './usecases/get-author.usecase'
+import { CreateAuthorUsecase } from './usecases/create-author.usecase'
+import { UpdateAuthorUsecase } from './usecases/update-author.usecase'
+import { DeleteAuthorUsecase } from './usecases/delete-author.usecase'
 
 @Module({
-  imports: [DatabaseModule, PrismaAuthorsRepository],
+  imports: [DatabaseModule],
   providers: [
     AuthorsResolver,
     {
@@ -18,40 +18,46 @@ import { CreateAuthor } from './usecases/create-author.usecase'
       useClass: PrismaService,
     },
     {
-      provide: PrismaAuthorsRepository,
-      useFactory: (prisma: PrismaService) =>
-        new PrismaAuthorsRepository(prisma),
+      provide: 'AuthorsRepository',
+      useFactory: (prisma: PrismaService) => {
+        return new AuthorsPrismaRepository(prisma)
+      },
       inject: ['PrismaService'],
     },
     {
-      provide: ListAuthors.UseCase,
-      useFactory: (repository: PrismaAuthorsRepository) =>
-        new ListAuthors.UseCase(repository),
-      inject: [PrismaAuthorsRepository],
+      provide: ListAuthorsUsecase.Usecase,
+      useFactory: (authosRepository: AuthorsPrismaRepository) => {
+        return new ListAuthorsUsecase.Usecase(authosRepository)
+      },
+      inject: ['AuthorsRepository'],
     },
     {
-      provide: GetAuthor.UseCase,
-      useFactory: (repository: PrismaAuthorsRepository) =>
-        new GetAuthor.UseCase(repository),
-      inject: [PrismaAuthorsRepository],
+      provide: GetAuthorUsecase.Usecase,
+      useFactory: (authosRepository: AuthorsPrismaRepository) => {
+        return new GetAuthorUsecase.Usecase(authosRepository)
+      },
+      inject: ['AuthorsRepository'],
     },
     {
-      provide: UpdateAuthor.UseCase,
-      useFactory: (repository: PrismaAuthorsRepository) =>
-        new UpdateAuthor.UseCase(repository),
-      inject: [PrismaAuthorsRepository],
+      provide: CreateAuthorUsecase.Usecase,
+      useFactory: (authosRepository: AuthorsPrismaRepository) => {
+        return new CreateAuthorUsecase.Usecase(authosRepository)
+      },
+      inject: ['AuthorsRepository'],
     },
     {
-      provide: DeleteAuthor.UseCase,
-      useFactory: (repository: PrismaAuthorsRepository) =>
-        new DeleteAuthor.UseCase(repository),
-      inject: [PrismaAuthorsRepository],
+      provide: UpdateAuthorUsecase.Usecase,
+      useFactory: (authosRepository: AuthorsPrismaRepository) => {
+        return new UpdateAuthorUsecase.Usecase(authosRepository)
+      },
+      inject: ['AuthorsRepository'],
     },
     {
-      provide: CreateAuthor.UseCase,
-      useFactory: (repository: PrismaAuthorsRepository) =>
-        new CreateAuthor.UseCase(repository),
-      inject: [PrismaAuthorsRepository],
+      provide: DeleteAuthorUsecase.Usecase,
+      useFactory: (authosRepository: AuthorsPrismaRepository) => {
+        return new DeleteAuthorUsecase.Usecase(authosRepository)
+      },
+      inject: ['AuthorsRepository'],
     },
   ],
 })

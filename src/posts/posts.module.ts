@@ -1,16 +1,17 @@
 import { DatabaseModule } from '@/database/database.module'
-import { PrismaPostRepository } from '@/database/posts/prisma-posts-repository'
 import { PrismaService } from '@/database/prisma/prisma.service'
 import { Module } from '@nestjs/common'
-import { CreatePost } from './usecases/create-post-usecase'
-import { PostsRepository } from './repositories/posts-repository'
-import { PrismaAuthorsRepository } from '@/database/authors/prisma-authos-repository'
-import { GetPost } from './usecases/get-post-usecase'
-import { TogglePost } from './usecases/publish-post-usecase'
-import { PostsResolver } from './graphql/resolvers/post.resolver'
+import { PostsPrismaRepository } from './repositories/posts-prisma.repository'
+import { CreatePostUseCase } from './usecases/create-post.usecase'
+import { AuthorsPrismaRepository } from '@/authors/repositories/authors-prisma.repository'
+import { GetPostUseCase } from './usecases/get-post.usecase'
+import { PublishPostUseCase } from './usecases/publish-post.usecase'
+import { UnpublishPostUseCase } from './usecases/unpublish-post.usecase'
+import { PostsResolver } from './graphql/resolvers/posts.resolver'
+import { GetAuthorUsecase } from '@/authors/usecases/get-author.usecase'
 
 @Module({
-  imports: [DatabaseModule, PrismaAuthorsRepository, PrismaPostRepository],
+  imports: [DatabaseModule],
   providers: [
     PostsResolver,
     {
@@ -18,40 +19,56 @@ import { PostsResolver } from './graphql/resolvers/post.resolver'
       useClass: PrismaService,
     },
     {
-      provide: PrismaPostRepository,
-      useFactory: (prisma: PrismaService) => new PrismaPostRepository(prisma),
+      provide: 'PostsRepository',
+      useFactory: (prismaService: PrismaService) => {
+        return new PostsPrismaRepository(prismaService)
+      },
       inject: ['PrismaService'],
     },
     {
       provide: 'AuthorsRepository',
       useFactory: (prismaService: PrismaService) => {
-        return new PrismaAuthorsRepository(prismaService)
+        return new AuthorsPrismaRepository(prismaService)
       },
       inject: ['PrismaService'],
     },
     {
-      provide: CreatePost.UseCase,
+      provide: CreatePostUseCase.UseCase,
       useFactory: (
-        postsRepository: PrismaPostRepository,
-        authorsRepository: PrismaAuthorsRepository,
+        postsRepository: PostsPrismaRepository,
+        authorsRepository: AuthorsPrismaRepository,
       ) => {
-        return new CreatePost.UseCase(postsRepository, authorsRepository)
+        return new CreatePostUseCase.UseCase(postsRepository, authorsRepository)
       },
-      inject: [PrismaPostRepository, PrismaAuthorsRepository],
+      inject: ['PostsRepository', 'AuthorsRepository'],
     },
     {
-      provide: GetPost.UseCase,
-      useFactory: (postsRepository: PrismaPostRepository) => {
-        return new GetPost.UseCase(postsRepository)
+      provide: GetPostUseCase.UseCase,
+      useFactory: (postsRepository: PostsPrismaRepository) => {
+        return new GetPostUseCase.UseCase(postsRepository)
       },
-      inject: [PrismaPostRepository],
+      inject: ['PostsRepository'],
     },
     {
-      provide: TogglePost.UseCase,
-      useFactory: (postsRepository: PrismaPostRepository) => {
-        return new TogglePost.UseCase(postsRepository)
+      provide: PublishPostUseCase.UseCase,
+      useFactory: (postsRepository: PostsPrismaRepository) => {
+        return new PublishPostUseCase.UseCase(postsRepository)
       },
-      inject: [PrismaPostRepository],
+      inject: ['PostsRepository'],
+    },
+    {
+      provide: UnpublishPostUseCase.UseCase,
+      useFactory: (postsRepository: PostsPrismaRepository) => {
+        return new UnpublishPostUseCase.UseCase(postsRepository)
+      },
+      inject: ['PostsRepository'],
+    },
+    {
+      provide: GetAuthorUsecase.Usecase,
+      useFactory: (authorsRepository: AuthorsPrismaRepository) => {
+        return new GetAuthorUsecase.Usecase(authorsRepository)
+      },
+      inject: ['AuthorsRepository'],
     },
   ],
 })
